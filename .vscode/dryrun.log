@@ -1,0 +1,8 @@
+make.exe -f c:\Users\flavi\Documents\Aeds_Pratica\tp02-flavia_larissa\${workspace} --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/cygdrive/c/Users/flavi/Documents/Aeds_Pratica/tp02-flavia_larissa'
+make: Leaving directory '/cygdrive/c/Users/flavi/Documents/Aeds_Pratica/tp02-flavia_larissa'
+ 
+make: c:\Users\flavi\Documents\Aeds_Pratica\tp02-flavia_larissa\$workspace: No such file or directory
+make: *** No rule to make target 'c:\Users\flavi\Documents\Aeds_Pratica\tp02-flavia_larissa\$workspace'.
+make: Failed to remake makefile 'c:\Users\flavi\Documents\Aeds_Pratica\tp02-flavia_larissa\$workspace'.
+
