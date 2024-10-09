@@ -81,7 +81,7 @@ no* remove_Raiz(no *raiz) {
         return raiz;
     } else {
         // Caso a raiz tenha dois filhos
-        no *aux = raiz->esq;
+        no *aux = raiz->dir;
         no *pai_aux = raiz;
 
         // Encontrar o nó mais à direita da subárvore esquerda
