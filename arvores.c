@@ -76,7 +76,7 @@ no* remove_Raiz(no *raiz) {
         return raiz;
     } else {
         // Caso a raiz tenha dois filhos
-        no *aux = raiz->dir;
+        no *aux = raiz->esq;
         no *pai_aux = raiz;
 
         // Encontrar o nó mais à direita da subárvore esquerda
@@ -197,7 +197,7 @@ double arvore_binaria(int instancia_num) {
 
 //Funções utilizadas na árvore balanceada
 // Obtem a altura da AVL
-int altura(struct Node *N) { 
+int altura(no_avl * N) { 
     if (N == NULL) {
         return 0; 
     }
@@ -213,8 +213,8 @@ int max(int a, int b)  {
 } 
   
 /* Cria um novo nó com apontadores esquerda e direita nulos */
-struct Node* newNode(int valor) { 
-    struct Node* node = (struct Node*) malloc(sizeof(struct Node)); 
+no_avl * newNode(int valor) { 
+    no_avl* node = (no_avl*) malloc(sizeof(no_avl)); 
     node->valor     = valor; 
     node->esquerda  = NULL; 
     node->direita   = NULL; 
@@ -223,9 +223,9 @@ struct Node* newNode(int valor) {
 } 
   
 // Faz a rotação a direita na raiz y
-struct Node *direitaRotate(struct Node *y) { 
-    struct Node *x = y->esquerda; 
-    struct Node *T2 = x->direita; 
+no_avl *direitaRotate(no_avl *y) { 
+    no_avl *x = y->esquerda; 
+    no_avl *T2 = x->direita; 
   
     // Realiza a rotação
     x->direita = y; 
@@ -240,9 +240,9 @@ struct Node *direitaRotate(struct Node *y) {
 } 
   
 // Faz a rotação a esquerda na raiz x
-struct Node *esquerdaRotate(struct Node *x) { 
-    struct Node *y = x->direita; 
-    struct Node *T2 = y->esquerda;
+no_avl *esquerdaRotate(no_avl *x) { 
+    no_avl *y = x->direita; 
+    no_avl *T2 = y->esquerda;
 
     y->esquerda = x;
     x->direita = T2;
@@ -255,7 +255,7 @@ struct Node *esquerdaRotate(struct Node *x) {
 } 
   
 // Obtem o fator de balanceamento para o nó N
-int balanceamento(struct Node *N) { 
+int balanceamento(no_avl *N) { 
     if (N == NULL) {
         return 0; 
     }
@@ -263,7 +263,7 @@ int balanceamento(struct Node *N) {
 } 
 
 //Faz a inserção do nó na árvore (função recursiva)
-struct Node* inserir(struct Node* node, int valor) { 
+no_avl* inserir(no_avl* node, int valor) { 
     /* 1.  Realiza a inserção normal de árvore binária */
     if (node == NULL) {
         return(newNode(valor)); 
@@ -308,6 +308,8 @@ struct Node* inserir(struct Node* node, int valor) {
     //retorna o ponteiro para a raiz
     return node;
 }
+
+
   
 double arvore_balanceada(int instancia_num) {
     double tempo = 0;

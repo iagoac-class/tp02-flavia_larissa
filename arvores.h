@@ -9,12 +9,12 @@ typedef struct no_
     struct no_ *dir;
 } no;
 
-struct Node {
+typedef struct no_avl {
     int valor;
-    struct Node *esquerda;
-    struct Node *direita;
+    struct no_avl *esquerda;
+    struct no_avl *direita;
     int altura;
-};
+} no_avl;
 
 double arvore_binaria(int instancia_num);
 double arvore_balanceada(int instancia_num);
