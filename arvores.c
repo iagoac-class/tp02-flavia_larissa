@@ -192,6 +192,8 @@ double arvore_binaria(int instancia_num) {
     // calcula o tempo decorrido encontrando a diferença (end - begin) e
     // dividindo a diferença por CLOCKS_PER_SEC para converter em segundos
     tempo += (double)(end - begin) / CLOCKS_PER_SEC;
+
+    libera_memoria(raiz);
     return (tempo);
 }
 
@@ -263,16 +265,16 @@ int balanceamento(no_avl *N) {
 } 
 
 //Faz a inserção do nó na árvore (função recursiva)
-no_avl* inserir(no_avl* node, int valor) { 
+no_avl* inserir_avl(no_avl* node, int valor) { 
     /* 1.  Realiza a inserção normal de árvore binária */
     if (node == NULL) {
         return(newNode(valor)); 
     }
   
     if (valor < node->valor) {
-        node->esquerda  = inserir(node->esquerda, valor); 
+        node->esquerda  = inserir_avl(node->esquerda, valor); 
     } else if (valor > node->valor){ 
-        node->direita = inserir(node->direita, valor); 
+        node->direita = inserir_avl(node->direita, valor); 
     } else { 
         // Valores duplicados não são permitidos na AVL
         return node; 
@@ -309,17 +311,189 @@ no_avl* inserir(no_avl* node, int valor) {
     return node;
 }
 
+//faz a busca na arvore avl
+//(diferencia-se da árvore binária apenas no tipo dos parâmetros)
+no_avl * busca_avl(no_avl * raiz, int k){
+    if(raiz==NULL || (*raiz).valor == k)
+        return raiz;
+    if((*raiz).valor > k)
+        return busca_avl((*raiz).esquerda, k);
+    else
+        return busca_avl((*raiz).direita, k);
+}
 
+//faz a busca do pai na árvore avl
+//(diferencia-se da árvore binária apenas no tipo dos parâmetros)
+no_avl * buscaPai_avl(no_avl * raiz, int filho){
+    if(raiz == NULL || (*raiz).valor == filho){
+        return NULL;
+    }else{
+        if(((*raiz).esquerda != NULL && (*(*raiz).esquerda).valor == filho) || ((*raiz).direita != NULL && (*(*raiz).direita).valor == filho)){
+            return raiz;
+        }else{
+            no_avl * pai = buscaPai_avl((*raiz).esquerda, filho);
+            if(pai == NULL){
+                pai = buscaPai_avl((*raiz).direita, filho);
+            }
+            return pai;
+        }
+    }
+}
+
+//remove a raiz da arvore avl
+//diferencia-se da arvore binaria apenas pelo tipo dos parâmetros
+no_avl * removerRaiz(no_avl * raiz){
+    if(raiz == NULL){
+        return NULL;
+    }
+
+    if((*raiz).esquerda == NULL && (*raiz).direita == NULL){
+        free(raiz);
+        return NULL;
+    }else if ((*raiz).esquerda == NULL){
+        no_avl * aux = raiz;
+        raiz = (*raiz).direita;
+        free(aux);
+        return raiz;
+    }else if ((*raiz).direita == NULL){
+        no_avl *aux = raiz;
+        raiz = (*raiz).esquerda;
+        free(aux);
+        return raiz;
+    }else{
+        no_avl * aux = (*raiz).esquerda;
+        no_avl * aux_pai = raiz;
+        while((*aux).direita != NULL){
+            aux_pai = aux;
+            aux = (*aux).direita;
+        }
+        (*raiz).valor = (*aux).valor;
+        if((*aux_pai).direita == aux){
+            (*aux_pai).direita = (*aux).esquerda;
+        }else{
+            (*aux_pai).esquerda = (*aux).esquerda;
+        }
+        free(aux);
+        return raiz;
+    } 
+}
+
+//remove um nó na árvore avl
+no_avl * remover_avl(no_avl * node, int valor){
+    //faz a remoção de uma árvore binária normal
+    no_avl * n = busca_avl(node,valor);
+    if(n!=NULL){
+        no_avl * pai = buscaPai_avl(node, (*n).valor);
+        if(pai!=NULL){
+            if((*pai).direita == n){
+                (*pai).direita = removerRaiz(n);
+            }else{
+                (*pai).esquerda = removerRaiz(n);
+            }
+        }else{
+            node = removerRaiz(n);
+        }
+    }
+    /* 2. Atualiza a altura de seu antecessor */
+    node->altura = 1 + max(altura(node->esquerda), 
+                        altura(node->direita)); 
   
+    /* 3. Obtem o fator de balanceamento da raiz */
+    int balance = balanceamento(node); 
+
+    // Se a árvore está desbalanceada, então existem quatro casos possíveis
+  
+    // Caso esquerda esquerda
+    if (balance > 1 && valor < node->esquerda->valor) {
+        return direitaRotate(node); 
+    }
+    // Caso direita direita
+    if (balance < -1 && valor > node->direita->valor) {
+        return esquerdaRotate(node); 
+    }
+    //Caso esquerda direita
+    if (balance > 1 && valor > node->esquerda->valor) { 
+        node->esquerda =  esquerdaRotate(node->esquerda); 
+        return direitaRotate(node); 
+    } 
+    //Caso direita esquerda
+    if (balance < -1 && valor < node->direita->valor) { 
+        node->direita = direitaRotate(node->direita); 
+        return esquerdaRotate(node); 
+    } 
+
+    //retorna o ponteiro para a raiz
+    return node;
+}
+
+void caminho_em_ordem(no_avl* raiz){
+    if(raiz == NULL){
+        printf("arvore vazia\n");
+        return;
+    }
+    if((*raiz).esquerda != NULL){
+        caminho_em_ordem((*raiz).esquerda);
+    }
+    printf("no: %d, altura: %d\n", (*raiz).valor, (*raiz).altura);
+    if((*raiz).direita != NULL){
+        caminho_em_ordem((*raiz).direita);
+    }
+}
+
+void libera_memoria_avl(no_avl * raiz){
+
+    if(raiz != NULL){
+        libera_memoria_avl(raiz->esquerda);
+        libera_memoria_avl(raiz->direita);
+        free(raiz);
+    }
+
+}
+
+
 double arvore_balanceada(int instancia_num) {
     double tempo = 0;
     clock_t begin = clock();
 
-    
+    // Nome do arquivo baseado no número da instância
+    char caminho_completo[256];
+
+    // Concatenar o caminho fixo com o número da instância
+    snprintf(caminho_completo, sizeof(caminho_completo), "%s%d", CAMINHO_FIXO, instancia_num);
+    printf("Caminho completo: %s\n", caminho_completo);
+
+    // Abrir o arquivo
+    FILE* file = fopen(caminho_completo, "r");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo\n");
+        exit(0);
+    }
+
+    // Ler os valores do arquivo e inserir/remover na árvore binária
+    no_avl* raiz = NULL;
+    char linha[256];
+    while (fgets(linha, sizeof(linha), file)) {
+        char operacao;
+        int valor;
+        sscanf(linha, "%c %d", &operacao, &valor);
+        if (operacao == 'I') {
+            raiz = inserir_avl(raiz, valor);
+        } else if (operacao == 'R') {
+            raiz = remover_avl(raiz, valor);
+        }
+        caminho_em_ordem(raiz);
+        printf("---\n");
+
+    }
+
+    // Fechar o arquivo
+    fclose(file);
+
     clock_t end = clock();
     // calcula o tempo decorrido encontrando a diferença (end - begin) e
     // dividindo a diferença por CLOCKS_PER_SEC para converter em segundos
     tempo += (double)(end - begin) / CLOCKS_PER_SEC;
+    libera_memoria_avl(raiz);
     return (tempo);
 }
 
@@ -340,6 +514,5 @@ int main(int argc, char* argv[]) {
     double tempo_balanceada = arvore_balanceada(instancia_num);
 
     printf("%f\n%f\n", tempo_n_balanceada, tempo_balanceada);
-
     return (1);
 }
