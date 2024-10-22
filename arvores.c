@@ -226,6 +226,9 @@ no_avl * newNode(int valor) {
   
 // Faz a rotação a direita na raiz y
 no_avl *direitaRotate(no_avl *y) { 
+    if(y == NULL || (*y).esquerda == NULL){
+        return y;
+    }
     no_avl *x = y->esquerda; 
     no_avl *T2 = x->direita; 
   
@@ -243,6 +246,9 @@ no_avl *direitaRotate(no_avl *y) {
   
 // Faz a rotação a esquerda na raiz x
 no_avl *esquerdaRotate(no_avl *x) { 
+    if(x == NULL || (*x).direita == NULL){
+        return x;
+    }
     no_avl *y = x->direita; 
     no_avl *T2 = y->esquerda;
 
@@ -395,8 +401,10 @@ no_avl * remover_avl(no_avl * node, int valor){
         }
     }
     /* 2. Atualiza a altura de seu antecessor */
-    node->altura = 1 + max(altura(node->esquerda), 
-                        altura(node->direita)); 
+    if (node!=NULL){
+        node->altura = 1 + max(altura(node->esquerda), 
+                            altura(node->direita)); 
+    }
   
     /* 3. Obtem o fator de balanceamento da raiz */
     int balance = balanceamento(node); 
@@ -404,20 +412,21 @@ no_avl * remover_avl(no_avl * node, int valor){
     // Se a árvore está desbalanceada, então existem quatro casos possíveis
   
     // Caso esquerda esquerda
-    if (balance > 1 && valor < node->esquerda->valor) {
+
+    if (node != NULL && balance > 1 && valor < node->esquerda->valor) {
         return direitaRotate(node); 
     }
     // Caso direita direita
-    if (balance < -1 && valor > node->direita->valor) {
+    if (node != NULL && balance < -1 && valor > node->direita->valor) {
         return esquerdaRotate(node); 
     }
     //Caso esquerda direita
-    if (balance > 1 && valor > node->esquerda->valor) { 
+    if (node != NULL && balance > 1 && valor > node->esquerda->valor) { 
         node->esquerda =  esquerdaRotate(node->esquerda); 
         return direitaRotate(node); 
     } 
     //Caso direita esquerda
-    if (balance < -1 && valor < node->direita->valor) { 
+    if (node != NULL && balance < -1 && valor < node->direita->valor) { 
         node->direita = direitaRotate(node->direita); 
         return esquerdaRotate(node); 
     } 
@@ -469,7 +478,7 @@ double arvore_balanceada(int instancia_num) {
         exit(0);
     }
 
-    // Ler os valores do arquivo e inserir/remover na árvore binária
+    // Ler os valores do arquivo e inserir/remover na árvore balanceada
     no_avl* raiz = NULL;
     char linha[256];
     while (fgets(linha, sizeof(linha), file)) {
@@ -481,8 +490,8 @@ double arvore_balanceada(int instancia_num) {
         } else if (operacao == 'R') {
             raiz = remover_avl(raiz, valor);
         }
-        caminho_em_ordem(raiz);
-        printf("---\n");
+        //caminho_em_ordem(raiz);
+        //printf("---\n");
 
     }
 
